@@ -1,0 +1,11 @@
+variables:
+  tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' # not set by me dgk
+  subscription_id: '' # not set by me dgk
+  application_id: '' # not set by me dgk
+  azureml_datastore: 'innereyedatasets' # not set by me dgk
+  resource_group: 'InnerEye-DeepLearning' # not set by me dgk
+  docker_shm_size: '440g' # not set by me dgk
+  workspace_name: 'InnerEye-DeepLearning' # not set by me dgk
+  cluster: 'training-nd24' # not set by me dgk
+  model_configs_namespace: 'InnerEyeLocal.ML.configs'
+  extra_code_directory: 'InnerEyeLocal'
