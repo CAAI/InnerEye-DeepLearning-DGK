@@ -1,0 +1,63 @@
+WARNING:azureml.core:Failure while loading azureml_run_type_providers. Failed to load entrypoint automl = azureml.train.automl.run:AutoMLRun._from_run_dto with exception (cloudpickle 2.0.0 (/homes/kovacs/anaconda3/envs/InnerEye/lib/python3.7/site-packages), Requirement.parse('cloudpickle<2.0.0,>=1.1.0'), {'azureml-dataprep'}).
+Starting InnerEye runner at InnerEyeLocal/ML/runner.py
+Setting up logging to stdout.
+Setting logging level to 20 (INFO)
+2022-08-05T09:42:40Z INFO     rpdb is handling traps. To debug: identify the main runner.py process, then as root: kill -TRAP <process_id>; nc 127.0.0.1 4444
+2022-08-05T09:42:40Z WARNING  (from attempt to import module InnerEye.ML.configs.segmentation.HNC_tumor_dgk): No module named 'InnerEye.ML.configs.ML'
+2022-08-05T09:42:40Z WARNING  (from attempt to import module InnerEyeLocal.ML.configs.segmentation.hnc): No module named 'InnerEye.ML.configs.ML'
+2022-08-05T09:42:40Z INFO     Found class <class 'InnerEyeLocal.ML.configs.segmentation.HNC_tumor_dgk_HeadAndNeckBase.HNC_tumor_dgk_HeadAndNeckBase'> in file /homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase.py
+2022-08-05T09:42:40Z INFO     Creating the default output folder structure.
+2022-08-05T09:42:40Z INFO     All results will be written to a subfolder of the project root folder.
+2022-08-05T09:42:40Z INFO     Run outputs folder: /homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/outputs/2022-08-05T094240Z_HNC_tumor_dgk_HeadAndNeckBase
+2022-08-05T09:42:40Z INFO     Logs folder: /homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/outputs/2022-08-05T094240Z_HNC_tumor_dgk_HeadAndNeckBase/logs
+2022-08-05T09:42:40Z INFO     extra_code_directory is InnerEyeLocal, which exists
+Setting logging level to 20 (INFO)
+2022-08-05T09:42:40Z INFO     Git repository information:
+2022-08-05T09:42:40Z INFO         source_repository   : InnerEye-DeepLearning
+2022-08-05T09:42:40Z INFO         source_branch       : main
+2022-08-05T09:42:40Z INFO         source_id           : 0b52cec00e561dcdf58a80189c062d6caa2da273
+2022-08-05T09:42:40Z INFO         source_dirty        : True
+2022-08-05T09:42:40Z INFO         source_author       : David Kovacs
+2022-08-05T09:42:40Z INFO         source_message      : createt the InnerEye local folder folloering the guidelines at https://github.com/microsoft/InnerEye-DeepLearning/blob/m
+2022-08-05T09:42:40Z INFO     No settings for the MPI central node found. Assuming that this is a single node training job.
+2022-08-05T09:42:40Z INFO     Global seed set to 42
+2022-08-05T09:42:40Z INFO     All results will be written to a subfolder of the project root folder.
+2022-08-05T09:42:40Z INFO     Run outputs folder: /homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/outputs/2022-08-05T094240Z_HNC_tumor_dgk_HeadAndNeckBase
+2022-08-05T09:42:40Z INFO     Logs folder: /homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/outputs/2022-08-05T094240Z_HNC_tumor_dgk_HeadAndNeckBase/logs
+/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/test.py:21: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  dataset_df_for_dict['pt_id'] = dataset_df_for_dict['filePath'].str[20:-12]
+Traceback (most recent call last):
+  File "InnerEyeLocal/ML/runner.py", line 15, in <module>
+    main() 
+  File "InnerEyeLocal/ML/runner.py", line 11, in main
+    post_cross_validation_hook=None)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/runner.py", line 451, in run
+    return runner.run()
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/runner.py", line 218, in run
+    self.run_in_situ(azure_run_info)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/runner.py", line 406, in run_in_situ
+    self.ml_runner.setup(azure_run_info)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/run_ml.py", line 195, in setup
+    self.container.setup()
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/lightning_base.py", line 160, in setup
+    dataset_splits = self.config.get_dataset_splits()
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/model_config_base.py", line 206, in get_dataset_splits
+    splits = self.get_model_train_test_dataset_splits(dataset_df)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase.py", line 29, in get_model_train_test_dataset_splits
+    val_ids=val_ids)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/utils/split_dataset.py", line 304, in from_subject_ids
+    subject_column=subject_column, group_column=group_column)
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/utils/split_dataset.py", line 236, in _from_split_keys
+    subject_column=subject_column, group_column=group_column)
+  File "<string>", line 8, in __init__
+  File "/homes/kovacs/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning/InnerEye/ML/utils/split_dataset.py", line 61, in __post_init__
+    .format(len(unique_train), len(unique_val)))
+ValueError: train_ids(0), val_ids(0) must have at least one value
+
+real	0m6.445s
+user	0m4.447s
+sys	0m0.754s

@@ -1,3 +1,30 @@
+'''
+Purpose: Running training and inference using InnerEye Deep Learning model training on HNC data.
+
+Note: The content of the get_model_train_test_dataset_splits needs to be adapted depending on the training/test data used.
+
+Unfortunately, currently 5 files need to be adapted to do a complete inference with majority voting. These are: 
+
+InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase.py
+InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase_f1.py
+InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase_f2.py
+InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase_f3.py
+InnerEye-DeepLearning/InnerEyeLocal/ML/configs/segmentation/HNC_tumor_dgk_HeadAndNeckBase_f4.py
+
+I use the model in the following way:
+If needed log on to AI machine (ssh kovacs@10.49.144.33 or local machine for me)
+
+Running the model:
+# screen -S/r inner-eye -- useful so you can close computer and keep running after
+# export CUDA_VISIBLE_DEVICES=X -- select X to match the gpu you want to use. 
+# conda activate InnerEye
+
+# cd ~/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning (or whereever you located your InnerEye repo)
+# then run:
+# export PYTHONPATH=`pwd`
+# python InnerEyeLocal/ML/runner.py --model=HNC_tumor_dgk_HeadAndNeckBase_fX
+'''
+
 from pathlib import Path
 from InnerEye.ML.configs.segmentation.HeadAndNeckBase import HeadAndNeckBase
 from InnerEye.ML.config import PhotometricNormalizationMethod
@@ -19,74 +46,46 @@ class HNC_tumor_dgk_HeadAndNeckBase_f1(HeadAndNeckBase):
             )
 
     def get_model_train_test_dataset_splits(self, dataset_df: pd.DataFrame) -> DatasetSplits:
-        # load dataset split - first path to file
         '''
-        Note: To run on the same validation set for fold 0 all models during prediction dataset_df for fold 0 needs to be used.
+        Note:
+
+        Inference on validation set:
+        To run on the same validation set for fold 0 all models during prediction dataset_df for fold 0 needs to be used.
         During training the fold should be the one you want to train on, i.e. in this case mathing the folk provided in the filename (0,1,2,3,4)
         This note is only relevant when the following predict function is used from commandline:
         python InnerEyeLocal/ML/runner.py --model=HNC_tumor_dgk_HeadAndNeckBase --no-train --local_weights_path=.../last.ckpt --inference_on_val_set=True
+
+        Inference on test set:
+        - adding of test and validation data is only to avoid crash of the DatasetSplits.from_sibject_ids function. They are never used.
+        - Command to run is in the file /MEDIcaTe/implemented_methods/inner-eye/predict/test/run_test_inference_inner_eye.sh
+        - Command line contains the flag --no-train ensuring no training is done
+        - Command line contains the flag --inference_on_test_set=True so the inference will be performed on this. 
+        - dataset.csv was created before running on test set. Unfortunately it needs to contain test labels to work. 
         '''
-        fold = 0 # during training: set to 1
-    
+        fold = 0  # during training: set to 1
         split_file = '/homes/kovacs/project_data/hnc-auto-contouring/nnUNet/nnUNet_preprocessed/Task500_HNC01/splits_final.pkl'
         split = load_pickle(split_file)
-        
+
         train_ids_list = split[fold]['train']
-        test_ids_list = []
         val_ids_list = split[fold]['val']
 
-        #create a dict from pt id to subject id based. 
+        # create a dict from pt id to subject id based. 
         dataset_df_for_dict = dataset_df
         dataset_df_for_dict = dataset_df_for_dict.drop_duplicates('subject')
-        dataset_df_for_dict['pt_id'] = dataset_df_for_dict['filePath'].str[20:-12] #note this line gives a warning
+        pt_ids = dataset_df_for_dict.loc[:, ['filePath']]['filePath'].str[20:-12]
+        dataset_df_for_dict.insert(3, 'pt_id', pt_ids)
 
         # map split_file ids (nnUNet) to dataset_df ids (inner-eye)
         dict_pt2sub_id = dict(zip(list(dataset_df_for_dict['pt_id']), list(dataset_df_for_dict['subject'])))
         train_set = [*map(dict_pt2sub_id.get, train_ids_list)]
         val_set = [*map(dict_pt2sub_id.get, val_ids_list)]
 
-        return DatasetSplits.from_subject_ids(dataset_df, 
+        test_set = list(map(str,list(range(836, 836+195+1))))
+
+        datasplit_return = DatasetSplits.from_subject_ids(dataset_df,
                                               train_ids=train_set,
-                                              test_ids=test_ids_list,
+                                              test_ids=test_set,
                                               val_ids=val_set)
-
-# Note of runs:
-# /outputs/2022-05-25T134739Z_HNC_tumor_dgk_HeadAndNeckBase run was with norm_method=PhotometricNormalizationMethod.Unchanged on normalized data, num_data_workers=20 and num_gpus=1
-# /outputs/2022-05-27T091802Z_HNC_tumor_dgk_HeadAndNeckBase run was with norm_method=PhotometricNormalizationMethod.Unchanged on normalized data, num_data_workers=20 and num_gpus=1
-# /outputs/2022-05-28T111738Z_HNC_tumor_dgk_HeadAndNeckBase run was just with its standard norm for both PET and CT. I didn't use normalized data for this run, num_data_workers=64 and it crashed.
-# TODO 31-05-2022: Do run from may 28 again but this time do it with num_workers=20 and num_gpus=1.
-
-# TODO 24-05-2022: Normalize all the data as for DeepMedic and train on that. 
-
-# if needed: ssh kovacs@10.49.144.33
-
-# Running the model:
-# screen -S/r inner-eye
-# export CUDA_VISIBLE_DEVICES=X
-# conda activate InnerEye
-
-# cd ~/project_scripts/hnc_segmentation/inner-eye-ms-oktay/InnerEye-DeepLearning
-# then run:
-# export PYTHONPATH=`pwd`
-# python InnerEyeLocal/ML/runner.py --model=HNC_tumor_dgk_HeadAndNeckBase_f1
-
-'''
-to predict: Check command in /homes/kovacs/project_scripts/hnc_segmentation/MEDIcaTe/implemented_methods/inner-eye/inference_valSet.sh
-'''
-
-# https://github.com/microsoft/InnerEye-DeepLearning/blob/main/docs/building_models.md
-
-# adding number_of_cross_validation_splits=5 gave:
-# NotImplementedError: Offline cross validation is only supported for classification models.
-
-'''
-Documentation for the restrict_subjects parameter:
-"Use at most this number of subjects for train, val, or test set (must be > 0 or None). "
-                         "If None, do not modify the train, val, or test sets. If a string of the form 'i,j,k' where "
-                         "i, j and k are integers, modify just the corresponding sets (i for train, j for val, k for "
-                         "test). If any of i, j or j are missing or are negative, do not modify the corresponding "
-                         "set. Thus a value of 20,,5 means limit training set to 20, keep validation set as is, and "
-                         "limit test set to 5. If any of i,j,k is '+', discarded members of the other sets are added "
-                         "to that set."
-restrict_subjects='+,,0', # no testdata since I have already created a separate test-set
-'''
+                                              
+        print(f'datasplit_return = {datasplit_return}')
+        return datasplit_return
